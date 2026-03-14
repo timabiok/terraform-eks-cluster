@@ -1,0 +1,55 @@
+# =============================================================================
+# Example: Create VPC + EKS (create_vpc = true)
+# =============================================================================
+# Copy to terraform.auto.tfvars and adjust. Leave create_vpc = true to use
+# https://github.com/timabiok/terraform-aws-vpc
+# =============================================================================
+
+create_vpc = true
+
+region = "us-east-1"
+env    = "prod"
+app    = "myapp"
+owner  = "platform"
+
+# VPC (only used when create_vpc = true)
+vpc_cidr           = "10.0.0.0/16"
+single_nat_gateway = false  # true for dev to save cost
+
+allowed_https_cidr_blocks = ["0.0.0.0/0"]  # or restrict to office/VPN
+allowed_ssh_cidr_blocks   = ["1.2.3.4/32"]
+db_ingress_ports         = [3306, 5432]
+
+# EKS
+cluster_name    = "myapp-prod-eks"
+cluster_version = "1.31"
+
+cluster_endpoint_public_access  = true
+cluster_endpoint_private_access = true
+
+cluster_enabled_log_types = ["api", "audit", "authenticator"]
+
+node_groups = {
+  general = {
+    instance_types = ["m5.large"]
+    min_size       = 2
+    max_size       = 10
+    desired_size   = 3
+    disk_size      = 50
+  }
+}
+
+enable_irsa              = true
+enable_cluster_encryption = true
+
+# =============================================================================
+# Example: Use existing VPC (create_vpc = false)
+# =============================================================================
+# Uncomment and set your existing VPC/subnets; comment out create_vpc block above.
+# =============================================================================
+# create_vpc = false
+# vpc_id     = "vpc-xxxxxxxxxxxxxxxxx"
+# private_subnet_ids = ["subnet-aaa", "subnet-bbb", "subnet-ccc"]
+# public_subnet_ids  = ["subnet-xxx", "subnet-yyy", "subnet-zzz"]  # optional
+# vpc_cidr_block     = "10.0.0.0/16"
+# =============================================================================
